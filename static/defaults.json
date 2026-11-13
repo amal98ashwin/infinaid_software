@@ -1,0 +1,104 @@
+{
+  "Load SET": {
+    "filename": ""
+  },
+  "Load XLSX": {
+    "filename": "",
+    "sfreq": 256.0,
+    "unit": "\u00b5V"
+  },
+  "Load XDF": {
+    "filename": "",
+    "stream_index": 0,
+    "sfreq": 0.0,
+    "unit": "V"
+  },
+  "Channel Selector": {
+    "channels": []
+  },
+  "Bad Channel Labelling": {
+    "percentile": 75.0
+  },
+  "Bandpass Filter": {
+    "low": 1.0,
+    "high": 40.0
+  },
+  "Z Score": {},
+  "Crop Timing": {
+    "start": 0.0,
+    "stop": 10.0
+  },
+  "ICA": {
+    "n_components": 20,
+    "brain_threshold": 10.0
+  },
+  "Bad Component Removal": {},
+  "Resampler": {
+    "target_sfreq": 128.0
+  },
+  "Re-referencing": {
+    "mode": "Common Average",
+    "channel": ""
+  },
+  "Save SET": {
+    "filename": ""
+  },
+  "Power Feature Extraction": {
+    "feature_name": "AlphaPower",
+    "fmin": 8.0,
+    "fmax": 12.0,
+    "method": "Absolute Band Power",
+    "window_size": 2.0,
+    "overlap": 50.0,
+    "window": "hann"
+  },
+  "Periodic Band Power": {
+    "feature_name": "AlphaPeriodicPower",
+    "fmin": 8.0,
+    "fmax": 12.0,
+    "fit_fmin": 1.0,
+    "fit_fmax": 45.0,
+    "window_size": 2.0,
+    "overlap": 50.0,
+    "window": "hann"
+  },
+  "Aperiodic 1/f": {
+    "feature_name": "AperiodicOffset",
+    "fmin": 1.0,
+    "fmax": 40.0,
+    "parameter": "Offset",
+    "window_size": 4.0,
+    "overlap": 50.0,
+    "window": "hann"
+  },
+  "Band Cordance": {
+    "feature_name": "ThetaCordance",
+    "fmin": 4.0,
+    "fmax": 8.0,
+    "total_fmin": 1.0,
+    "total_fmax": 45.0,
+    "window_size": 2.0,
+    "overlap": 50.0,
+    "window": "hann"
+  },
+  "Bandpower Asymmetry": {
+    "feature_name": "AlphaAsymmetry",
+    "channel_a": "",
+    "channel_b": "",
+    "fmin": 8.0,
+    "fmax": 12.0,
+    "method": "Log Power Ratio",
+    "window_size": 2.0,
+    "overlap": 50.0,
+    "window": "hann"
+  },
+  "Export Table": {
+    "filename": "",
+    "mode": "temporal"
+  },
+  "Correlation": {},
+  "Load CSV": {
+    "sfreq": 256,
+    "unit": "\u00b5V"
+  }
+}

@@ -1,0 +1,12 @@
+Flask==3.1.1
+numpy==1.26.4
+scipy==1.13.1
+mne==1.9.0
+mne-icalabel==0.7.0
+onnxruntime==1.20.1; sys_platform != "darwin"
+onnxruntime==1.17.3; sys_platform == "darwin"
+scikit-learn==1.6.1
+openpyxl==3.1.5
+pyxdf==1.16.8
+eeglabio==0.0.2.post4
+matplotlib==3.9.4
