@@ -75,8 +75,8 @@ def describe(node):
         raw = node.raw
         idx = np.linspace(0, raw.n_times - 1, min(raw.n_times, 1200), dtype=int)
         result["signal"] = {"channels":raw.ch_names, "times":raw.times[idx].tolist(),
-                            "values":raw._data[:, idx].tolist(), "sfreq":raw.info["sfreq"],
-                            "samples":raw.n_times, "bads":raw.info["bads"]}
+                            "values":raw._data[:, idx].tolist(), "sfreq":float(raw.info["sfreq"]),
+                            "samples":int(raw.n_times), "bads":raw.info["bads"]}
     if node.features:
         result["features"] = {k: v.tolist() for k,v in node.features["features"].items()}
         result["times"] = node.features["times"].tolist()
