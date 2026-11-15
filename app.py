@@ -73,12 +73,15 @@ def describe(node):
     result = {}
     if node.raw is not None:
         raw = node.raw
-        idx = np.linspace(0, raw.n_times - 1, min(raw.n_times, 1200), dtype=int)
-        result["signal"] = {"channels":raw.ch_names, "times":raw.times[idx].tolist(),
-                            "values":raw._data[:, idx].tolist(), "sfreq":float(raw.info["sfreq"]),
-                            "samples":int(raw.n_times), "bads":raw.info["bads"]}
+        # Encode channel rows separately so the viewer decodes only visible channels.
+        result["signal"] = {
+            "channels": list(raw.ch_names), "samples": int(raw.n_times),
+            "sfreq": float(raw.info["sfreq"]), "bads": list(raw.info["bads"]),
+            "rows": [base64.b64encode(np.asarray(row, dtype="<f4").tobytes()).decode("ascii")
+                     for row in raw._data],
+        }
     if node.features:
-        result["features"] = {k: v.tolist() for k,v in node.features["features"].items()}
+        result["features"] = {k: np.where(np.isfinite(v), v, None).tolist() for k,v in node.features["features"].items()}
         result["times"] = node.features["times"].tolist()
     if node.ica is not None:
         result["components"] = [{"index":i,"label":str(label),"probabilities":p.tolist(),
