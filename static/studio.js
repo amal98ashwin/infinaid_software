@@ -106,7 +106,7 @@ function resultViewer(result, parent, featureMode) {
   }
   const windowSize=number('Window (s)',5);
   windowSize.min='0.000001';
-  const low=number('Y minimum',''), high=number('Y maximum','');
+  const low=number('Y minimum (µV)',''), high=number('Y maximum (µV)','');
   low.placeholder=high.placeholder='Auto';
   const reset=button('Auto Y',controls,()=>{low.value=high.value='';refresh();});
   const status=element('small',undefined,parent);
@@ -114,7 +114,7 @@ function resultViewer(result, parent, featureMode) {
   const viewport=element('div',undefined,parent);
   const rows=featureMode?4:8;
   const rowHeight=Math.max(featureMode?70:42,Math.min(featureMode?110:64,Math.floor(innerHeight*.52/rows)));
-  viewport.style.cssText='overflow-y:auto;height:'+Math.min(rows,names.length)*rowHeight+'px;border:1px solid #cad6d4';
+  viewport.style.cssText='overflow-y:auto;height:'+Math.min(rows,names.length)*rowHeight+'px;border:1px solid #495460';
   const spacer=element('div',undefined,viewport);
   spacer.style.cssText='height:'+names.length*rowHeight+'px;position:relative';
   const label=element('label','Time position ',parent);
@@ -153,7 +153,7 @@ function resultViewer(result, parent, featureMode) {
   function refresh(){
     const duration=windowSize.valueAsNumber;
     const manual=low.value!==''||high.value!=='';
-    const minY=low.valueAsNumber,maxY=high.valueAsNumber;
+    const minY=low.valueAsNumber/1e6,maxY=high.valueAsNumber/1e6;
     if(!(duration>0)||(manual&&!(maxY>minY))){
       status.textContent='Enter a positive window and two ordered Y limits, or select Auto Y.';return;
     }
@@ -163,7 +163,7 @@ function resultViewer(result, parent, featureMode) {
     const top=Math.floor(viewport.scrollTop/rowHeight);
     const stop=Math.min(names.length,top+rows+1);
     for(const i of decoded.keys())if(i<top||i>=stop)decoded.delete(i);
-    status.textContent=start.toFixed(2)+' – '+end.toFixed(2)+' s'+(featureMode?' · Feature over time (left) · Distribution over the full recording (right)':' · Amplitude in node output units');
+    status.textContent=start.toFixed(2)+' – '+end.toFixed(2)+' s'+(featureMode?' · Feature over time (left) · Distribution over the full recording (right)':' · Scale bars in µV');
     spacer.replaceChildren();
     for(let i=top;i<stop;i++){
       const data=series(i), canvas=element('canvas',undefined,spacer);
@@ -172,18 +172,22 @@ function resultViewer(result, parent, featureMode) {
       canvas.width=w*dpr;canvas.height=h*dpr;canvas.setAttribute('aria-label',names[i]);
       const c=canvas.getContext('2d');c.scale(dpr,dpr);
       const left=55,right=featureMode?Math.floor(w*.67):w-12,yTop=17,yBottom=h-15;
-      c.fillStyle=i%2?'#f4f8f8':'#fff';c.fillRect(0,0,w,h);
-      c.fillStyle='#163c40';c.font='bold 11px sans-serif';c.fillText(names[i],6,12,right-6);
+      c.fillStyle=i%2?'#2e353e':'#293039';c.fillRect(0,0,w,h);
+      c.fillStyle='#e6edf4';c.font='bold 11px sans-serif';c.fillText(names[i],6,12,right-6);
       const [lo,hi]=manual?[minY,maxY]:bounds(data,a,b);
       const y=v=>yBottom-(v-lo)/(hi-lo)*(yBottom-yTop);
-      c.font='10px sans-serif';c.fillText(fmt(hi),2,yTop+6,left-5);c.fillText(fmt(lo),2,yBottom,left-5);
+      c.font='10px sans-serif';
+      if(!featureMode){
+        c.strokeStyle='#b4c2d0';c.beginPath();c.moveTo(right-7,yTop);c.lineTo(right-7,yBottom);c.stroke();
+        c.textAlign='right';c.fillStyle='#e6edf4';c.fillText(fmt((hi-lo)*1e6)+' µV',right-14,12);c.textAlign='left';
+      }
       for(let k=0;k<=4;k++){
         const x=left+(right-left)*k/4;
-        c.fillStyle='#d8e3e3';c.fillRect(x,yTop,1,yBottom-yTop);
-        c.fillStyle='#4b6668';c.textAlign='center';c.fillText(fmt(start+duration*k/4)+'s',x,h-3);c.textAlign='left';
+        c.fillStyle='#46515e';c.fillRect(x,yTop,1,yBottom-yTop);
+        c.fillStyle='#b4c2d0';c.textAlign='center';c.fillText(fmt(start+duration*k/4)+'s',x,h-3);c.textAlign='left';
       }
       c.save();c.beginPath();c.rect(left,yTop,right-left+1,yBottom-yTop+1);c.clip();
-      c.strokeStyle='#067775';c.fillStyle=c.strokeStyle;c.beginPath();
+      c.strokeStyle='#85e4cc';c.fillStyle=c.strokeStyle;c.beginPath();
       let connected=false;
       for(let j=a;j<b;j++){
         const v=data[j];if(!Number.isFinite(v)){connected=false;continue;}
@@ -195,9 +199,9 @@ function resultViewer(result, parent, featureMode) {
       c.stroke();c.restore();
       if(featureMode){
         const {min,max,bins}=histogram(i,data),x=right+24,width=w-x-10,peak=Math.max(1,...bins);
-        c.fillStyle='#457b9d';
+        c.fillStyle='#8bbdf0';
         bins.forEach((n,k)=>{const bar=(yBottom-yTop)*n/peak;c.fillRect(x+k*width/24,yBottom-bar,Math.max(1,width/24-1),bar);});
-        c.fillStyle='#4b6668';c.fillText(fmt(min),x,h-3);c.textAlign='right';c.fillText(fmt(max),w-5,h-3);
+        c.fillStyle='#b4c2d0';c.fillText(fmt(min),x,h-3);c.textAlign='right';c.fillText(fmt(max),w-5,h-3);
         c.fillText('Count · max '+Math.max(...bins),w-6,12);
       }
     }
@@ -209,6 +213,93 @@ function resultViewer(result, parent, featureMode) {
   },{passive:false});
   refresh();
 }
+function scalpMap(parent, positions, values, limits, title) {
+  parent.replaceChildren();
+  const valid=positions.flatMap((p,i)=>p && Number.isFinite(values[i]) ? [{p,v:values[i]}] : []);
+  if(valid.length<3){element('p','Scalp map requires at least three channels with known electrode positions.',parent);return;}
+  const canvas=element('canvas',undefined,parent);
+  canvas.width=600;canvas.height=530;canvas.style.cssText='width:100%;max-width:650px;display:block;margin:auto';
+  const c=canvas.getContext('2d'),cx=300,cy=250,r=195;
+  const [lo,hi]=limits,range=hi-lo||1;
+  function color(v){
+    const t=Math.max(0,Math.min(1,(v-lo)/range));
+    const a=t<.5?[72,134,220]:[236,239,231],b=t<.5?[236,239,231]:[229,97,93],f=t<.5?t*2:(t-.5)*2;
+    return 'rgb('+a.map((n,i)=>Math.round(n+(b[i]-n)*f)).join(',')+')';
+  }
+  c.save();c.beginPath();c.arc(cx,cy,r,0,2*Math.PI);c.clip();
+  for(let y=-r;y<r;y+=4)for(let x=-r;x<r;x+=4){
+    let total=0,weight=0;
+    for(const {p,v} of valid){
+      const d=(x/r-p[0])**2+(-y/r-p[1])**2,w=1/Math.max(d,1e-6);
+      total+=w*v;weight+=w;
+    }
+    c.fillStyle=color(total/weight);c.fillRect(cx+x,cy+y,4,4);
+  }
+  c.restore();c.strokeStyle='#bdcbd5';c.lineWidth=2;c.beginPath();c.arc(cx,cy,r,0,2*Math.PI);
+  c.moveTo(cx-17,cy-r+1);c.lineTo(cx,cy-r-26);c.lineTo(cx+17,cy-r+1);c.stroke();
+  for(const {p} of valid){c.fillStyle='#162b36';c.beginPath();c.arc(cx+r*p[0],cy-r*p[1],3,0,7);c.fill();}
+  c.fillStyle='#e6edf4';c.font='15px sans-serif';c.textAlign='center';c.fillText(title,cx,20);
+  c.fillText('Left',45,cy);c.fillText('Right',555,cy);
+  for(let x=0;x<300;x++){c.fillStyle=color(lo+range*x/299);c.fillRect(150+x,475,1,12);}
+  c.fillStyle='#d6e1eb';c.font='12px sans-serif';c.fillText(lo.toPrecision(3),150,508);c.fillText(hi.toPrecision(3),450,508);
+}
+function featureMaps(result,parent) {
+  const labels=Object.keys(result.features),data=Object.values(result.features);
+  const holder=element('div',undefined,parent);
+  const control=element('label','Time ',parent),slider=element('input',undefined,control),time=element('output',undefined,control);
+  control.style.cssText='display:flex;gap:12px;align-items:center';
+  slider.type='range';slider.min=0;slider.max=Math.max(0,result.times.length-1);slider.step=1;slider.value=0;slider.style.flex='1';
+  let lo=Infinity,hi=-Infinity;
+  data.forEach(row=>row.forEach(v=>{if(Number.isFinite(v)){lo=Math.min(lo,v);hi=Math.max(hi,v);}}));
+  if(lo===hi){lo-=1;hi+=1;}
+  function draw(){
+    const i=Number(slider.value);time.value=Number(result.times[i]||0).toFixed(2)+' s';
+    scalpMap(holder,result.positions||[],data.map(row=>row[i]),[lo,hi],'Feature across electrodes');
+  }
+  slider.oninput=draw;draw();
+  element('p','Scalp colors use a fixed scale across time. Interpolation estimates values between electrodes.',parent);
+  const list=element('div',undefined,parent);list.style.cssText='height:400px;overflow-y:auto';
+  labels.forEach((name,i)=>{
+    const row=element('div',undefined,list);row.style.cssText='height:100px;border-top:1px solid #46515e;padding:6px';
+    element('small',name,row);
+    const canvas=element('canvas',undefined,row);canvas.width=800;canvas.height=70;canvas.style.cssText='width:100%;height:70px';
+    const c=canvas.getContext('2d'),finite=data[i].filter(Number.isFinite);
+    if(!finite.length){c.fillStyle='#d6e1eb';c.fillText('No finite values',10,30);return;}
+    let a=Infinity,b=-Infinity;finite.forEach(v=>{a=Math.min(a,v);b=Math.max(b,v);});
+    const bins=Array(32).fill(0);finite.forEach(v=>bins[Math.min(31,Math.floor((v-a)/(b-a||1)*32))]++);
+    const peak=Math.max(...bins);c.fillStyle='#8bbdf0';
+    bins.forEach((n,k)=>c.fillRect(45+k*22,48-n/peak*40,20,n/peak*40));
+    c.fillStyle='#d6e1eb';c.font='12px sans-serif';c.fillText(a.toPrecision(3),45,65);c.fillText(b.toPrecision(3),710,65);c.fillText('Count',0,12);c.fillText(String(peak),0,28);
+  });
+}
+function icaResults(node,parent){
+  const result=node.output,selection=element('select',undefined,parent);
+  result.components.forEach(c=>{element('option','IC '+c.index,selection).value=c.index;});
+  const map=element('div',undefined,parent);
+  function draw(){
+    const values=result.ica_maps?.[Number(selection.value)]||[];
+    const peak=values.reduce((a,v)=>Math.max(a,Math.abs(v)),0)||1;
+    scalpMap(map,result.ica_positions||[],values,[-peak,peak],'IC '+selection.value+' · component weights');
+  }
+  selection.onchange=draw;draw();
+  element('p','Select components to remove, then run the downstream removal node.',parent);
+  const wrap=element('div',undefined,parent);wrap.style.overflowX='auto';
+  const table=element('table',undefined,wrap);table.className='preview-table';
+  const head=element('tr',undefined,element('thead',undefined,table));
+  ['Remove','Component','ICLabel','Brain','Muscle','Eye','Heart','Line noise','Channel noise','Other'].forEach(t=>element('th',t,head));
+  const body=element('tbody',undefined,table),checks=[];
+  for(const component of result.components){
+    const row=element('tr',undefined,body),cell=element('td',undefined,row),check=element('input',undefined,cell);
+    check.type='checkbox';check.checked=(node.params.exclude??result.components.filter(c=>c.remove).map(c=>c.index)).includes(component.index);
+    checks.push({check,index:component.index});
+    element('td','IC '+component.index,row);element('td',component.label,row);
+    component.probabilities.forEach(v=>element('td',(100*v).toFixed(1)+'%',row));
+    check.onchange=()=>{node.params.exclude=checks.filter(c=>c.check.checked).map(c=>c.index);render();};
+    row.onclick=e=>{if(e.target!==check){selection.value=component.index;draw();}};
+  }
+  button('Use automatic threshold',parent,()=>{delete node.params.exclude;render();showResults(node);});
+}
+
 function showResults(node) {
   const result=node?.output;
   if (!result) return toast('Run the workflow and select a completed node.');
@@ -217,19 +308,9 @@ function showResults(node) {
   dialog.style.cssText='width:min(900px,90vw);max-height:85vh;overflow:auto';
   $('#modalBg').classList.add('show');
   element('h3',node.name,dialog);
-  if (result.signal) resultViewer(result,dialog,false);
-  if (result.features) resultViewer(result,dialog,true);
-  if(result.components) {
-    element('p','Select components to remove, then run the downstream removal node. Probabilities are ordered brain, muscle, eye, heart, line, channel, other.',dialog);
-    for(const component of result.components) {
-      const row=element('label',undefined,dialog); row.style.display='block';
-      const check=element('input',undefined,row);check.type='checkbox';
-      check.checked=(node.params.exclude??result.components.filter(c=>c.remove).map(c=>c.index)).includes(component.index);
-      row.append(' IC '+component.index+' · '+component.label+' · '+component.probabilities.map(v=>(100*v).toFixed(1)+'%').join(' / '));
-      check.onchange=()=>{node.params.exclude=[...dialog.querySelectorAll('input[type=checkbox]')].flatMap((c,i)=>c.checked?[i]:[]);render();};
-    }
-    button('Use automatic threshold',dialog,()=>{delete node.params.exclude; render(); dialog.parentElement.classList.remove('show');});
-  }
+  if (result.signal && !result.components) resultViewer(result,dialog,false);
+  if (result.features) featureMaps(result,dialog);
+  if(result.components) icaResults(node,dialog);
   if(result.r!==undefined)element('p','Pearson r = '+result.r,dialog);
   button('Close',dialog,()=>$('#modalBg').classList.remove('show'));
 }

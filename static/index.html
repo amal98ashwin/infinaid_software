@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Build and run EEG processing workflows in your browser.">
-<title>Infinaid EEG Workflow Studio</title>
+<link rel="icon" href="/infinaid.ico"><title>Infinaid EEG Workflow Studio</title>
 <style>
 :root{--ink:#10272a;--muted:#758789;--line:#e1e9e7;--paper:#f7faf9;--teal:#087f73;--teal2:#13a18e;--pale:#e6f5f0;--orange:#d47d42;--red:#ce5b55;--white:#fff;--shadow:0 14px 38px #11372c12}
 *{box-sizing:border-box}body{margin:0;font-family:'DM Sans',sans-serif;color:var(--ink);background:#f3f7f6;overflow:hidden}button,input,select{font:inherit}button{cursor:pointer} .app{height:100vh;display:flex;flex-direction:column;min-width:1020px}
@@ -14,10 +14,56 @@
 .inspector{width:288px;background:#fff;border-left:1px solid var(--line);flex-shrink:0;display:flex;flex-direction:column;overflow:auto}.inspect-head{padding:20px 18px 14px;border-bottom:1px solid #edf2f0}.inspect-head h2{margin:7px 0 4px;font:700 15px Manrope}.inspect-desc{font-size:10px;line-height:1.55;color:#879592}.form{padding:15px 18px;display:flex;flex-direction:column;gap:14px}.field label{font-size:10px;font-weight:700;color:#526663;display:block;margin-bottom:6px}.field input,.field select{width:100%;height:34px;padding:0 9px;border:1px solid #dce6e2;border-radius:6px;background:#fbfdfc;font-size:11px;color:#233b3b;outline:none}.field input:focus,.field select:focus{border-color:#63ae9a;box-shadow:0 0 0 3px #0d977a13}.field small{display:block;color:#9aa6a4;font-size:9px;margin-top:5px;line-height:1.4}.field.inline{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field.inline .subfield label{font-size:9px;color:#80918d}.dropzone{border:1px dashed #b7cdc4;border-radius:8px;background:#f7fbf9;padding:13px 10px;text-align:center;cursor:pointer}.dropzone:hover{border-color:#198b78;background:#f0f9f5}.dropzone b{font-size:10px;color:#397067;display:block;margin:3px}.dropzone span{font-size:9px;color:#94a29e}.filemeta{font:9px 'DM Mono';color:#758986;margin-top:8px;word-break:break-all}.notice{padding:10px 11px;background:#f5f8f7;border-radius:7px;font-size:10px;color:#71817e;line-height:1.5}.notice.warn{background:#fff7ed;color:#9b6839;border:1px solid #f4e2cb}.inspect-empty{margin:auto;text-align:center;padding:22px;color:#9aa8a5}.inspect-empty .empty-icon{margin-bottom:12px}.inspect-empty b{display:block;color:#556b67;font-size:12px;margin-bottom:6px}.inspect-empty p{font-size:10px;line-height:1.6;margin:0}.inspect-footer{margin-top:auto;padding:12px 18px 16px;border-top:1px solid #edf2f0;display:flex;gap:7px}.inspect-footer .btn{flex:1;justify-content:center;padding:8px 6px;font-size:10px}
 .bottom{height:145px;background:#fff;border-top:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}.bottom-top{height:43px;display:flex;align-items:center;padding:0 17px;gap:10px;border-bottom:1px solid #eff3f1}.bottom-title{font:700 11px Manrope}.run-summary{font-size:10px;color:#94a19f}.bottom-top .btn{margin-left:auto;padding:6px 10px;font-size:10px}.log{overflow:auto;flex:1;padding:9px 18px;font:10px 'DM Mono';color:#82918f}.logline{padding:3px 0}.logline.ok{color:#45846b}.logline.err{color:#c15a50}.logline b{font-weight:500;color:#435c57}.logline .time{color:#b1bdba;margin-right:10px}.toast{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);background:#163a35;color:white;padding:10px 15px;border-radius:8px;font-size:11px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}.toast.show{opacity:1}.modal-bg{position:fixed;inset:0;background:#183b3644;display:none;align-items:center;justify-content:center;z-index:10}.modal-bg.show{display:flex}.modal{width:420px;background:#fff;border-radius:12px;padding:22px;box-shadow:0 24px 80px #17352d30}.modal h3{font:700 17px Manrope;margin:0 0 7px}.modal p{font-size:11px;color:#758480;line-height:1.6;margin:0 0 17px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.modal .field{margin-top:12px}.modal.preview{width:min(760px,90vw)}.table-wrap{overflow:auto;max-height:55vh;border:1px solid var(--line);border-radius:8px}.preview-table{border-collapse:collapse;width:100%;font:10px 'DM Mono';white-space:nowrap}.preview-table th,.preview-table td{padding:8px 10px;border-bottom:1px solid #edf2f0;text-align:right}.preview-table th{position:sticky;top:0;background:#f5f8f7;color:#5f7771}.preview-table th:first-child,.preview-table td:first-child{text-align:left}
 @media(max-width:1200px){.palette{width:218px}.inspector{width:260px}.brand{min-width:215px}.project-label{display:none}}
+
+:root{color-scheme:dark;--ink:#edf0f3;--muted:#a4adb8;--line:#3b4048;--paper:#292c32;--teal:#6ed6bf;--teal2:#87e4cf;--pale:#273f3a;--white:#24272d;--shadow:0 14px 38px #0005}
+body{background:#22252a;font-family:'DM Sans',Arial,sans-serif}
+.topbar,.palette,.canvas-head,.inspector,.bottom{background:#24272d}
+.topbar{box-shadow:0 2px 12px #0002}
+.canvas{background-color:#30333a;background-image:radial-gradient(#50545d .7px,transparent .7px)}
+.node{background:#3a3e46;border-color:#535963;box-shadow:0 6px 18px #0003}
+.node:hover{border-color:#7a858f;box-shadow:0 8px 24px #0005}
+.node.selected{border-color:#6ed6bf;box-shadow:0 0 0 3px #6ed6bf22,0 8px 24px #0005}
+.node-top,.inspect-head,.inspect-footer,.bottom-top,.preview-table td,.preview-table th{border-color:var(--line)}
+.node-icon,.empty-icon,.picon{background:#2d4942;color:#92e6ce}
+.picon.blue{background:#303f56;color:#a1c8ff}
+.picon.amber{background:#4e4130;color:#f2c78e}
+.picon.purple{background:#433851;color:#d5b6fb}
+.picon.gray{background:#3c4149;color:#c2cbd5}
+.node-bottom,.mini,.brand-sub,.project-label,.save-state,.eyebrow,.palette-help,.group-title,.coming,.tab,.zoom,.crumb,.inspect-desc,.field small,.filemeta,.inspect-empty,.run-summary,.log,.modal p,.empty-board,.dropzone span{color:#a9b3bf}
+.palette-node,.field label,.field.inline .subfield label,.empty-board strong,.inspect-empty b,.logline b,.crumb b{color:#d9e0e7}
+.palette-node:hover{background:#343941;border-color:#4b535d}
+.btn,.tool{background:#353a42;border-color:#505761;color:#e2e8ee}
+.btn:hover,.tool:hover{background:#434b55;border-color:#7c8995}
+.btn.primary{background:#73d7c0;border-color:#73d7c0;color:#142e29;box-shadow:0 4px 14px #0002}
+.btn.primary:hover{background:#98e8d6}
+button:disabled{opacity:.5;cursor:default}
+input,select,textarea,.search input,.field input,.field select{background:#1e2228;color:#edf0f3;border:1px solid #535d68;border-radius:6px;padding:6px;accent-color:#73d7c0}
+input::placeholder{color:#9ea9b6}
+:focus-visible{outline:2px solid #8ee4d0;outline-offset:3px}
+.field input:focus,.field select:focus{border-color:#73d7c0;box-shadow:0 0 0 3px #73d7c020}
+input[type=file]::file-selector-button{background:#3b444e;color:#edf0f3;border:0;border-radius:4px;padding:6px 9px;margin-right:8px}
+input[type=checkbox],input[type=range]{accent-color:#73d7c0}
+.ports{background:#292e35;border-color:#91c8bb}
+.ports:hover{background:#73d7c0;border-color:#baf4e6}
+.edge{stroke:#8aafa7}.edge.selected{stroke:#97f0d9}.edge-arrow{fill:#8aafa7}
+.status{background:#84909c}.status.done,.dot{background:#78dcad}.status.error{background:#ff9494}
+.dropzone,.notice{background:#30363d;color:#c0cbd5;border-color:#637c77}
+.dropzone:hover{background:#354942}.dropzone b{color:#9ae0ce}
+.notice.warn{background:#493c2c;color:#f2ce98;border-color:#725b38}
+.logline.ok{color:#91dfb7}.logline.err{color:#ffa6a0}.logline .time{color:#939eab}
+.modal{background:#2b3037;color:#edf0f3;border:1px solid #505863;box-shadow:0 24px 80px #0008}
+.modal-bg{background:#101318b8;backdrop-filter:blur(5px)}
+.modal label,.modal small{color:#bcc7d2}
+.modal canvas{border-bottom:1px solid #424b56}
+.preview-table th{background:#353d47;color:#d5e0e9}
+.toast{background:#354a44;color:#e3fff6;border:1px solid #5d8d7d}
+*{scrollbar-width:thin;scrollbar-color:#687583 #292e35}
+::selection{background:#73d7c044;color:#fff}
+
 </style>
 </head>
 <body><div class="app">
-<header class="topbar"><div class="brand"><div class="brand-mark">i</div><div><div class="brand-name">infinaid</div><div class="brand-sub">EEG workflow studio</div></div></div><div class="divider"></div><div class="project-label"><strong>Untitled workflow</strong>Python processing · workflow saved locally</div><div class="top-spacer"></div><div class="save-state"><i class="dot"></i><span>Saved in this browser</span></div><button class="btn" id="newBtn" title="Clear workflow">＋ New</button><button class="btn" id="exportWorkflow">⇧ Export workflow</button><button class="btn primary run" id="runBtn">▶ &nbsp;Run workflow <span class="shortcut">⌘↵</span></button></header>
+<header class="topbar"><div class="brand"><img class="brand-mark" src="/infinaid.ico" alt="Infinaid"><div><div class="brand-name">infinaid</div><div class="brand-sub">EEG workflow studio</div></div></div><div class="divider"></div><div class="project-label"><strong>Untitled workflow</strong>Python processing · workflow saved locally</div><div class="top-spacer"></div><div class="save-state"><i class="dot"></i><span>Saved in this browser</span></div><button class="btn" id="newBtn" title="Clear workflow">＋ New</button><button class="btn" id="exportWorkflow">⇧ Export workflow</button><button class="btn primary run" id="runBtn">▶ &nbsp;Run workflow <span class="shortcut">⌘↵</span></button></header>
 <div class="body"><aside class="palette"><div class="palette-head"><div class="eyebrow">Build</div><div class="palette-title">Node library</div><div class="palette-help">Drag a step onto the canvas, then connect the ports.</div></div><div class="search"><span>⌕</span><input id="nodeSearch" placeholder="Find a node…"></div><div class="groups" id="groups"></div></aside>
 <main class="workspace"><div class="canvas-head"><div class="tab active">Workflow</div><div class="tab" id="dataTab">View results</div><div class="crumb">/ &nbsp;<b>Canvas</b></div><div class="canvas-tools"><button class="tool" id="fitBtn" title="Center workflow">⌖</button><button class="tool" id="zoomOut" title="Zoom out">−</button><span class="zoom" id="zoomLabel">100%</span><button class="tool" id="zoomIn" title="Zoom in">＋</button></div></div><div class="canvas" id="canvas"><div class="board" id="board"><svg class="links" id="links"></svg><div id="nodeLayer"></div><div class="empty-board" id="emptyBoard" style="display:none"><div class="empty-icon">⌘</div><strong>Your workflow starts here</strong><span>Drag nodes from the library, or start with a sample workflow.</span><br><button class="btn" style="pointer-events:auto;margin:13px auto" id="sampleBtn">Load sample workflow</button></div></div></div></main>
 <aside class="inspector" id="inspector"></aside></div>
