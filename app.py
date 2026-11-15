@@ -69,6 +69,31 @@ def load_recording(node, files):
         eeg.process_node(node)
 
 
+def scalp_positions(raw, names):
+    import mne
+    standard = mne.channels.make_standard_montage("standard_1020").get_positions()["ch_pos"]
+    lookup = {name.upper(): xyz for name, xyz in standard.items()}
+    actual = {name: ch["loc"][:3] for name, ch in zip(raw.ch_names, raw.info["chs"])}
+    points = []
+    for name in names:
+        if name is None:
+            points.append(None)
+            continue
+        xyz = actual.get(name)
+        if xyz is None or not np.isfinite(xyz).all() or np.linalg.norm(xyz) < 1e-8:
+            xyz = lookup.get(name.strip().rstrip(".").upper())
+        if xyz is None:
+            points.append(None)
+            continue
+        x, y, z = xyz
+        radius = np.linalg.norm(xyz)
+        angle = np.arccos(np.clip(z / radius, -1, 1))
+        azimuth = np.arctan2(y, x)
+        distance = angle / (np.pi / 2)
+        points.append([float(distance * np.cos(azimuth)), float(distance * np.sin(azimuth))])
+    return points
+
+
 def describe(node):
     result = {}
     if node.raw is not None:
@@ -81,9 +106,21 @@ def describe(node):
                      for row in raw._data],
         }
     if node.features:
+        raw = eeg.get_upstream_raw(node)
+        labels = list(node.features["features"])
+        matches = []
+        for label in labels:
+            matches.append(next((ch for ch in sorted(raw.ch_names, key=len, reverse=True)
+                                 if label.endswith("_" + ch)), None))
+        # Pair and global statistics have no single electrode location.
+        if node.name in ("Bandpower Asymmetry", "Band Cordance"):
+            matches = [None] * len(labels)
+        result["positions"] = scalp_positions(raw, matches)
         result["features"] = {k: np.where(np.isfinite(v), v, None).tolist() for k,v in node.features["features"].items()}
         result["times"] = node.features["times"].tolist()
     if node.ica is not None:
+        result["ica_positions"] = scalp_positions(node.raw, node.ica.ch_names)
+        result["ica_maps"] = node.ica.get_components().T.tolist()
         result["components"] = [{"index":i,"label":str(label),"probabilities":p.tolist(),
                                  "remove":i in node.ica_exclude}
             for i,(label,p) in enumerate(zip(node.ica_labels,node.ica_probabilities))]

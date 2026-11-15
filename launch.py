@@ -29,6 +29,24 @@ def local_identity():
     return identity
 
 def main():
+    if sys.platform == "win32":
+        import ctypes
+        from ctypes import wintypes
+        user32 = ctypes.windll.user32
+        user32.LoadImageW.argtypes = [wintypes.HINSTANCE, wintypes.LPCWSTR,
+                                     wintypes.UINT, ctypes.c_int, ctypes.c_int, wintypes.UINT]
+        user32.LoadImageW.restype = wintypes.HANDLE
+        ctypes.windll.kernel32.GetConsoleWindow.restype = wintypes.HWND
+        user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT,
+                                       wintypes.WPARAM, wintypes.LPARAM]
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Infinaid.EEGStudio.Desktop")
+        icon = user32.LoadImageW(None, str(Path(__file__).parent / "static" / "infinaid.ico"),
+                                1, 0, 0, 0x10 | 0x40)
+        window = ctypes.windll.kernel32.GetConsoleWindow()
+        if icon and window:
+            user32.SendMessageW(window, 0x80, 0, icon)
+            user32.SendMessageW(window, 0x80, 1, icon)
+        ctypes.windll.kernel32.SetConsoleTitleW("Infinaid EEG Studio")
     try:
         with build_opener(ProxyHandler({})).open(origin + "/local-identity", timeout=1) as response:
             if response.read(64).decode() == identity:

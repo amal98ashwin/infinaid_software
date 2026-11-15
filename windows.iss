@@ -1,7 +1,10 @@
 [Setup]
 AppId=Infinaid.EEGStudio.Desktop
 AppName=Infinaid EEG Studio
-AppVersion=1.0
+AppVersion=1.1
+AppPublisher=Infinaid Technologies Pvt Ltd
+SetupIconFile=static\infinaid.ico
+UninstallDisplayIcon={app}\static\infinaid.ico
 DefaultDirName={localappdata}\Programs\Infinaid EEG Studio
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
@@ -14,7 +17,8 @@ UninstallDisplayName=Infinaid EEG Studio
 Source: "payload\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{userprograms}\Infinaid EEG Studio"; Filename: "{app}\runtime\python.exe"; Parameters: "-X utf8 ""{app}\launch.py"""; WorkingDir: "{app}"
+Name: "{userprograms}\Infinaid EEG Studio"; Filename: "{app}\runtime\python.exe"; Parameters: "-X utf8 ""{app}\launch.py"""; WorkingDir: "{app}"; IconFilename: "{app}\static\infinaid.ico"
+Name: "{userdesktop}\Infinaid EEG Studio"; Filename: "{app}\runtime\python.exe"; Parameters: "-X utf8 ""{app}\launch.py"""; WorkingDir: "{app}"; IconFilename: "{app}\static\infinaid.ico"
 
 [Run]
 Filename: "{app}\runtime\python.exe"; Parameters: "-X utf8 ""{app}\launch.py"""; WorkingDir: "{app}"; Description: "Open Infinaid EEG Studio"; Flags: postinstall nowait skipifsilent
